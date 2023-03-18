@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="./main.css">
+        <script src="./main.js"></script>
+        <title>salmdroidNW→csv変換</title>
+    </head>
+    <body>
+        <div id="main">
+            <div class="toolBlock">
+                <form name="converter">
+                    <h1>salmdroidNW→csv変換</h1>
+                    <h3>リザルトバックアップファイル</h3>
+                    <p class="toolInfo">salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したzipファイルを展開し、<em>内部の「1」という名前のファイルを選択</em>してください。</p>
+                    <p><input type="file" name="input_file"></p>
+                    <h3>csvに含めるデータ</h3>
+                    <p class="toolInfo">csvファイルに含めたいバイトデータを選択してください。</p>
+                    <h4>バイトリザルト</h4>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="id">バイトID</label>
+                        <label><input type="checkbox" class="dataSelector" name="playedTime">プレイ日時</label>
+                        <label><input type="checkbox" class="dataSelector" name="playedTimeUTC">プレイ日時(UTC)</label>
+                        <label><input type="checkbox" class="dataSelector" name="weapons">ブキ編成</label>
+                        <label><input type="checkbox" class="dataSelector" name="dangerRate">キケン度</label>
+                        <label><input type="checkbox" class="dataSelector" name="afterGrade">称号</label>
+                        <label><input type="checkbox" class="dataSelector" name="afterGradePoint">評価値</label>
+                        <label><input type="checkbox" class="dataSelector" name="clearWave">クリアしたWAVE数</label>
+                    </p>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="goldenEgg">合計金イクラ</label>
+                        <label><input type="checkbox" class="dataSelector" name="egg">合計イクラ</label>
+                        <label><input type="checkbox" class="dataSelector" name="scale">シャケのウロコ</label>
+                        <label><input type="checkbox" class="dataSelector" name="bossName">出現オカシラシャケ</label>
+                        <label><input type="checkbox" class="dataSelector" name="bossDefeat">オカシラシャケを倒せたか</label>
+                    </p>
+                    <h4>クマサンポイント</h4>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="jobPoint">獲得ポイント</label>
+                        <label><input type="checkbox" class="dataSelector" name="jobScore">バイトスコア</label>
+                        <label><input type="checkbox" class="dataSelector" name="jobRate">評価レート</label>
+                        <label><input type="checkbox" class="dataSelector" name="jobBonus">クリアボーナス</label>
+                    </p>
+                    <h4>WAVEごとのリザルト</h4>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="wave_deliver">納品数</label>
+                        <label><input type="checkbox" class="dataSelector" name="wave_norm">ノルマ</label>
+                        <label><input type="checkbox" class="dataSelector" name="wave_occurrence">特殊な状況</label>
+                        <label><input type="checkbox" class="dataSelector" name="wave_tide">潮位</label>
+                        <label><input type="checkbox" class="dataSelector" name="wave_egg">金イクラ出現数</label>
+                    </p>
+                    <h4>プレイヤーリザルト</h4>
+                    <p>
+                        <label><input type="checkbox" class="optionCheckbox" name="includeCoopPlayer">自分以外のリザルトも含める</label>
+                    </p>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="player_defeat">オオモノ撃破数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_deliver">納品数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_assist">納品アシスト数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_egg">赤イクラ数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_rescue">救出数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_rescued">被救出数</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_weapons">配布ブキ</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_special">配布スペシャル</label>
+                        <label><input type="checkbox" class="dataSelector" name="player_name">プレイヤー名</label>
+                    </p>
+                    <h4>オオモノシャケごとのリザルト</h4>
+                    <p>
+                        <label><input type="checkbox" class="dataSelector" name="enemy_defeat">撃破数</label>
+                        <label><input type="checkbox" class="dataSelector" name="enemy_selfDefeat">自撃破数</label>
+                        <label><input type="checkbox" class="dataSelector" name="enemy_appear">出現数</label>
+                    </p>
+                    <p><button type="button" class="confirm" onclick="Convert()">変換！</button></p>
+                </form>
+                </div>
+            <hr>
+            <div class="toolBlock">
+                <h2>概要</h2>
+                <ul>
+                    <li>
+                        Android用アプリ
+                        <a href="https://play.google.com/store/apps/details?id=com.aoi2blue.salmdroid.nw">salmdroidNW</a>
+                        で収集されたサーモンランNEXT WAVEのリザルトデータを、csvファイルに変換するツールです。
+                    </li>
+                    <li>
+                        salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したzipファイルを解凍し、
+                        内部の「1」という名前のファイルを処理することで、
+                        蓄積されたデータをcsvファイルに変換します。
+                    </li>
+                    <li>
+                        変換したcsvファイルはGoogleスプレッドシートやExcelにインポートできるので、
+                        自分のバイトデータの分析や集計に利用して、立ち回りの研究などに利用することができます。
+                    </li>
+                </ul>
+                <h2>注意事項</h2>
+                <ul>
+                    <li>
+                        「プレイ日時」は、閲覧している機器のタイムゾーンに準拠します。
+                    </li>
+                    <li>
+                        Javascriptによってクライアントサイドで処理しているため、バイトデータがツール側や外部に送信されることはありません。
+                        また、閲覧している機器によっては処理が遅いことがあります。
+                    </li>
+                    <li>
+                        本ツールは非公式です。任天堂株式会社様やsalmdroidNW製作者様とは一切関係ございません。
+                        また、salmdroidNWのアップデートなどによって使用できなくなることがあります。
+                    </li>
+                    <li>
+                        salmdroidNW 2.2.0 (2)で動作確認しています。
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
