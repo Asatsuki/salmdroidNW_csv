@@ -1,4 +1,4 @@
-var output_url;
+var outputUrl;
 let options;
 const enemies = ["バクダン", "カタパッド", "テッパン", "ヘビ", "タワー", "モグラ", "コウモリ", "ハシラ", "ダイバー", "テッキュウ", "ナベブタ",
     "キンシャケ", "グリル", "ドロシャケ"];
@@ -248,11 +248,11 @@ const column_templates = {
     enemy_appear: new ColumnGetterEnemy("popCount", "出現数"),
 }
 
-function GetRowFromCoopHistory(isHeader, options, column_datas, coopHistory) {
+function GetRowFromCoopHistory(isHeader, options, columnDatas, coopHistory) {
     let fields = [];
 
     // バイトリザルト
-    column_datas.forEach(column => {
+    columnDatas.forEach(column => {
         let columnGetter = column_templates[column];
         if (columnGetter !== undefined) {
             if (isHeader) {
@@ -266,18 +266,18 @@ function GetRowFromCoopHistory(isHeader, options, column_datas, coopHistory) {
 }
 
 function Convert() {
-    const results_key = "results";
-    const coopHistory_key = "coopHistory";
+    const resultsKey = "results";
+    const coopHistoryKey = "coopHistory";
 
-    const convert_form = document.converter;
+    const convertForm = document.converter;
 
     /** @type {HTMLInputElement} */
-    const input_file = convert_form.input_file;
+    const fileInputElement = convertForm.input_file;
 
-    let input_data;
-    let input = input_file.files[0];
+    let inputData;
+    let inputFile = fileInputElement.files[0];
 
-    let column_datas = GetColumns("dataSelector");
+    let columnDatas = GetColumns("dataSelector");
     options = GetOptions();
 
     const zipReader = new FileReader();
@@ -302,19 +302,19 @@ function Convert() {
         // JSONをパースする
         try {
             let textDecoder = new TextDecoder();
-            input_data = JSON.parse(textDecoder.decode(resultFileDecompressed));
+            inputData = JSON.parse(textDecoder.decode(resultFileDecompressed));
         } catch (e) {
             ShowError("JSONファイルの読み込みに失敗しました。\nファイルが壊れている可能性があります。");
             return;
         }
-        input_data[results_key] = JSON.parse(input_data[results_key]);
-        input_data[results_key].forEach(element => element[coopHistory_key] = JSON.parse(element[coopHistory_key]));
+        inputData[resultsKey] = JSON.parse(inputData[resultsKey]);
+        inputData[resultsKey].forEach(element => element[coopHistoryKey] = JSON.parse(element[coopHistoryKey]));
 
         // CSV出力
-        let str = GetRowFromCoopHistory(true, options, column_datas, null) + '\r\n';
-        input_data[results_key].forEach(element => {
+        let str = GetRowFromCoopHistory(true, options, columnDatas, null) + '\r\n';
+        inputData[resultsKey].forEach(element => {
             let coopHistory = element["coopHistory"];
-            let row = GetRowFromCoopHistory(false, options, column_datas, coopHistory);
+            let row = GetRowFromCoopHistory(false, options, columnDatas, coopHistory);
             str += row + '\r\n';
         });
 
@@ -322,8 +322,8 @@ function Convert() {
         let blob = new Blob([str], { type: "text/plain" });
 
         // 古いBlobのURLを破棄し、古いBlobのメモリを解放
-        if (output_url) URL.revokeObjectURL(output_url);
-        output_url = URL.createObjectURL(blob);
+        if (outputUrl) URL.revokeObjectURL(outputUrl);
+        outputUrl = URL.createObjectURL(blob);
 
         // ダウンロードリンクを作成
         let date = new Date();
@@ -335,30 +335,30 @@ function Convert() {
             date.getMinutes().toString().padStart(2, "0") + "-" +
             date.getSeconds().toString().padStart(2, "0");
         let link = document.createElement('a');
-        link.href = output_url;
+        link.href = outputUrl;
         link.download = `salmdroidNW_${date_str}.csv`;
         link.click();
     }
-    zipReader.readAsArrayBuffer(input);
+    zipReader.readAsArrayBuffer(inputFile);
 }
 
 function GetColumns(dataSelectorName) {
-    const data_selectors = document.getElementsByClassName(dataSelectorName);
-    let column_datas = [];
-    let data_selectors_ary = [...data_selectors];
-    data_selectors_ary.forEach(element => {
+    const dataSelectors = document.getElementsByClassName(dataSelectorName);
+    let columnDatas = [];
+    let dataSelectorsAry = [...dataSelectors];
+    dataSelectorsAry.forEach(element => {
         if (element.checked) {
-            column_datas.push(element.name);
+            columnDatas.push(element.name);
         }
     });
-    return column_datas;
+    return columnDatas;
 }
 
 function GetOptions() {
-    const option_checkboxes = document.getElementsByClassName("optionCheckbox");
+    const optionCheckboxes = document.getElementsByClassName("optionCheckbox");
     let options = {};
-    let option_checkboxes_ary = [...option_checkboxes];
-    option_checkboxes_ary.forEach(element => {
+    let optionCheckboxesAry = [...optionCheckboxes];
+    optionCheckboxesAry.forEach(element => {
         options[element.name] = element.checked;
     });
     return options;
