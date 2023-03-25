@@ -121,6 +121,7 @@ const column_templates = {
     dangerRate: new ColumnGetterSimple("dangerRate", "キケン度"),
     afterGrade: new ColumnGetterSimple("afterGrade.name", "称号"),
     afterGradePoint: new ColumnGetterSimple("afterGradePoint", "評価値"),
+    smellMeter: new ColumnGetterSimple("smellMeter", "オカシラゲージ"),
     bossName: new ColumnGetterSimple("bossResult.boss.name", "出現オカシラシャケ"),
     bossDefeat: new ColumnGetterSimple("bossResult.hasDefeatBoss", "オカシラシャケを倒せたか"),
     playedTime: new class extends ColumnGetter {
