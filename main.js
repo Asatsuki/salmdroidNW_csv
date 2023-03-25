@@ -326,11 +326,9 @@ function Convert() {
         outputUrl = URL.createObjectURL(blob);
 
         // ダウンロードリンクを作成
-        let date = new Date();
-        let date_str = inputFile.name;
         let link = document.createElement('a');
         link.href = outputUrl;
-        link.download = `salmdroidNW_${date_str}.csv`;
+        link.download = `${inputFile.name}.csv`;
         link.click();
     }
     zipReader.readAsArrayBuffer(inputFile);
