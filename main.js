@@ -327,13 +327,7 @@ function Convert() {
 
         // ダウンロードリンクを作成
         let date = new Date();
-        let date_str =
-            date.getFullYear().toString().padStart(4, "0") + "-" +
-            (date.getMonth() + 1).toString().padStart(2, "0") + "-" +
-            date.getDate().toString().padStart(2, "0") + "_" +
-            date.getHours().toString().padStart(2, "0") + "-" +
-            date.getMinutes().toString().padStart(2, "0") + "-" +
-            date.getSeconds().toString().padStart(2, "0");
+        let date_str = inputFile.name;
         let link = document.createElement('a');
         link.href = outputUrl;
         link.download = `salmdroidNW_${date_str}.csv`;
