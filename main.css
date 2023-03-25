@@ -69,6 +69,7 @@ button.confirm{
 
 .toolBlock{
     padding: 16px 0;
+    border-bottom: 2px solid #fff;
 }
 
 .toolInfo{

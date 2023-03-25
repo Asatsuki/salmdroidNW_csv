@@ -15,7 +15,7 @@
                 <form name="converter">
                     <h1>salmdroidNW→CSV変換</h1>
                     <h3>リザルトバックアップファイル</h3>
-                    <p class="toolInfo">salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したZIPファイルを選択してください。</p>
+                    <p class="toolInfo">salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したZIPファイル（salmdroid_backup_(日付時刻).zip）を選択してください。</p>
                     <p><input type="file" name="input_file" accept="application/zip"></p>
                     <h3>CSVに含めるデータ</h3>
                     <p class="toolInfo">CSVファイルに含めたいバイトデータを選択してください。</p>
@@ -76,8 +76,7 @@
                     </p>
                     <p><button type="button" class="confirm" onclick="Convert()">CSVに変換してダウンロード</button></p>
                 </form>
-                </div>
-            <hr>
+            </div>
             <div class="toolBlock">
                 <h2>概要</h2>
                 <ul>
@@ -107,6 +106,8 @@
                         salmdroidNW 2.2.1 (0)で動作確認しています。
                     </li>
                 </ul>
+            </div>
+            <div class="toolBlock">
                 <h2>更新情報</h2>
                 <ul>
                     <li>
