@@ -1,13 +1,14 @@
-var output_url;
+var outputUrl;
 let options;
 const enemies = ["バクダン", "カタパッド", "テッパン", "ヘビ", "タワー", "モグラ", "コウモリ", "ハシラ", "ダイバー", "テッキュウ", "ナベブタ",
-"キンシャケ", "グリル", "ドロシャケ"];
+    "キンシャケ", "グリル", "ドロシャケ"];
+const resultPath = "1";
 
 // カラム取得部分
 class ColumnGetter {
-    constructor() {}
-    getData(coopHistory) {}
-    getHeader() {}
+    constructor() { }
+    getData(coopHistory) { }
+    getHeader() { }
     dotWalk(obj, address) {
         let current = obj;
         let dotList = address.split(".");
@@ -15,8 +16,7 @@ class ColumnGetter {
             if (current != null) {
                 current = current[element];
             }
-            else
-            {
+            else {
                 return [""];
             }
         });
@@ -78,7 +78,7 @@ class ColumnGetterPlayer extends ColumnGetter {
         players.forEach(player => {
             fields.push(this.dotWalk(player, this.key));
         });
-        
+
         return fields;
     }
     getHeader() {
@@ -121,6 +121,7 @@ const column_templates = {
     dangerRate: new ColumnGetterSimple("dangerRate", "キケン度"),
     afterGrade: new ColumnGetterSimple("afterGrade.name", "称号"),
     afterGradePoint: new ColumnGetterSimple("afterGradePoint", "評価値"),
+    smellMeter: new ColumnGetterSimple("smellMeter", "オカシラゲージ"),
     bossName: new ColumnGetterSimple("bossResult.boss.name", "出現オカシラシャケ"),
     bossDefeat: new ColumnGetterSimple("bossResult.hasDefeatBoss", "オカシラシャケを倒せたか"),
     playedTime: new class extends ColumnGetter {
@@ -136,7 +137,7 @@ const column_templates = {
     weapons: new class extends ColumnGetter {
         getData(coopHistory) {
             let fields = [];
-            for (let i = 0; i < 4; i++){
+            for (let i = 0; i < 4; i++) {
                 fields.push(coopHistory["weapons"][i]["name"]);
             }
             return fields;
@@ -233,9 +234,9 @@ const column_templates = {
         getHeader() {
             if (options.includeCoopPlayer) {
                 return ["ブキW1(自分)", "ブキW2(自分)", "ブキW3(自分)", "ブキEX(自分)",
-                "ブキW1(2P)", "ブキW2(2P)", "ブキW3(2P)", "ブキEX(2P)",
-                "ブキW1(3P)", "ブキW2(3P)", "ブキW3(3P)", "ブキEX(3P)",
-                "ブキW1(4P)", "ブキW2(4P)", "ブキW3(4P)", "ブキEX(4P)"];
+                    "ブキW1(2P)", "ブキW2(2P)", "ブキW3(2P)", "ブキEX(2P)",
+                    "ブキW1(3P)", "ブキW2(3P)", "ブキW3(3P)", "ブキEX(3P)",
+                    "ブキW1(4P)", "ブキW2(4P)", "ブキW3(4P)", "ブキEX(4P)"];
             } else {
                 return ["ブキW1(自分)", "ブキW2(自分)", "ブキW3(自分)", "ブキEX(自分)"];
             }
@@ -247,11 +248,11 @@ const column_templates = {
     enemy_appear: new ColumnGetterEnemy("popCount", "出現数"),
 }
 
-function GetRowFromCoopHistory(isHeader, options, column_datas, coopHistory) {
+function GetRowFromCoopHistory(isHeader, options, columnDatas, coopHistory) {
     let fields = [];
 
     // バイトリザルト
-    column_datas.forEach(column => {
+    columnDatas.forEach(column => {
         let columnGetter = column_templates[column];
         if (columnGetter !== undefined) {
             if (isHeader) {
@@ -264,90 +265,97 @@ function GetRowFromCoopHistory(isHeader, options, column_datas, coopHistory) {
     return fields.map(field => `"${String(field).replace('"', '""')}"`).join(',');
 }
 
-function Convert(){
-    const results_key = "results";
-    const coopHistory_key = "coopHistory";
+function Convert() {
+    const resultsKey = "results";
+    const coopHistoryKey = "coopHistory";
 
-    const convert_form = document.converter;
-    const input_file = convert_form.input_file;
-    
-    const reader = new FileReader();
+    const convertForm = document.converter;
 
-    try {
-        let input_data;
-        let input = input_file.files[0];
+    /** @type {HTMLInputElement} */
+    const fileInputElement = convertForm.input_file;
 
-        let column_datas = GetColumns("dataSelector");
-        options = GetOptions();
+    let inputData;
+    let inputFile = fileInputElement.files[0];
 
-        reader.onload = () => {
-            // JSONをパースする
-            try {
-                input_data = JSON.parse(reader.result);
-            } catch(e) {
-                alert("変換に失敗しました。\nファイルが正しいことを確認してください。");
+    let columnDatas = GetColumns("dataSelector");
+    options = GetOptions();
+
+    const zipReader = new FileReader();
+    zipReader.onload = () => {
+        let resultFileDecompressed;
+
+        // ZIPファイルを展開
+        try {
+            let zipArr = new Uint8Array(zipReader.result);
+            let unzip = new Zlib.Unzip(zipArr);
+            let fileList = unzip.getFilenames();
+            if (!fileList.includes(resultPath)) {
+                ShowError("ZIPファイルにリザルトファイルが含まれていません。\nsalmdroidNWのリザルトバックアップファイルではない可能性があります。");
                 return;
             }
-            input_data[results_key] = JSON.parse(input_data[results_key]);
-            input_data[results_key].forEach(element => element[coopHistory_key] = JSON.parse(element[coopHistory_key]));
-
-            // csv出力
-            let str = GetRowFromCoopHistory(true, options, column_datas, null) + '\r\n';
-            input_data[results_key].forEach(element => {
-                let coopHistory = element["coopHistory"];
-                let row = GetRowFromCoopHistory(false, options, column_datas, coopHistory);
-                str += row + '\r\n';
-            });
-
-            // Blobを作成
-            let blob = new Blob([str], {type:"text/plain"});
-
-            // 古いBlobのURLを破棄し、古いBlobのメモリを解放
-            if (output_url) URL.revokeObjectURL(output_url);
-            output_url = URL.createObjectURL(blob);
-            
-            // ダウンロードリンクを作成
-            let date = new Date();
-            let date_str =
-                date.getFullYear().toString().padStart(4, "0") + "-" +
-                (date.getMonth()+1).toString().padStart(2, "0") + "-" + 
-                date.getDate().toString().padStart(2, "0") + "_" + 
-                date.getHours().toString().padStart(2, "0") + "-" + 
-                date.getMinutes().toString().padStart(2, "0") + "-" + 
-                date.getSeconds().toString().padStart(2, "0");
-            let link = document.createElement('a');
-            link.href = output_url;
-            link.download = `salmdroidNW_${date_str}.csv`;
-            link.click();
+            resultFileDecompressed = unzip.decompress(resultPath);
+        } catch (e) {
+            ShowError("ZIPファイルの展開に失敗しました。\nZIPファイルが壊れている可能性があります。");
+            return;
         }
 
-        reader.readAsText(input);
+        // JSONをパースする
+        try {
+            let textDecoder = new TextDecoder();
+            inputData = JSON.parse(textDecoder.decode(resultFileDecompressed));
+        } catch (e) {
+            ShowError("JSONファイルの読み込みに失敗しました。\nファイルが壊れている可能性があります。");
+            return;
+        }
+        inputData[resultsKey] = JSON.parse(inputData[resultsKey]);
+        inputData[resultsKey].forEach(element => element[coopHistoryKey] = JSON.parse(element[coopHistoryKey]));
+
+        // CSV出力
+        let str = GetRowFromCoopHistory(true, options, columnDatas, null) + '\r\n';
+        inputData[resultsKey].forEach(element => {
+            let coopHistory = element["coopHistory"];
+            let row = GetRowFromCoopHistory(false, options, columnDatas, coopHistory);
+            str += row + '\r\n';
+        });
+
+        // Blobを作成
+        let blob = new Blob([str], { type: "text/plain" });
+
+        // 古いBlobのURLを破棄し、古いBlobのメモリを解放
+        if (outputUrl) URL.revokeObjectURL(outputUrl);
+        outputUrl = URL.createObjectURL(blob);
+
+        // ダウンロードリンクを作成
+        let link = document.createElement('a');
+        link.href = outputUrl;
+        link.download = `${inputFile.name}.csv`;
+        link.click();
     }
-    catch (e)
-    {
-        alert("変換に失敗しました。\nファイルが正しいことを確認してください。");
-        return;
-    }
+    zipReader.readAsArrayBuffer(inputFile);
 }
 
 function GetColumns(dataSelectorName) {
-    const data_selectors = document.getElementsByClassName(dataSelectorName);
-    let column_datas = [];
-    let data_selectors_ary = [...data_selectors];
-    data_selectors_ary.forEach(element => {
+    const dataSelectors = document.getElementsByClassName(dataSelectorName);
+    let columnDatas = [];
+    let dataSelectorsAry = [...dataSelectors];
+    dataSelectorsAry.forEach(element => {
         if (element.checked) {
-            column_datas.push(element.name);
+            columnDatas.push(element.name);
         }
     });
-    return column_datas;
+    return columnDatas;
 }
 
 function GetOptions() {
-    const option_checkboxes = document.getElementsByClassName("optionCheckbox");
+    const optionCheckboxes = document.getElementsByClassName("optionCheckbox");
     let options = {};
-    let option_checkboxes_ary = [...option_checkboxes];
-    option_checkboxes_ary.forEach(element => {
+    let optionCheckboxesAry = [...optionCheckboxes];
+    optionCheckboxesAry.forEach(element => {
         options[element.name] = element.checked;
     });
     return options;
+}
+
+function ShowError(message) {
+    alert(message);
 }

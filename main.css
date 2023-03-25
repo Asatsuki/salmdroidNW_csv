@@ -53,10 +53,9 @@ em {
 }
 
 button{
-    width: 10em;
     font-size: 100%;
     margin: 8px;
-    padding: 8px;
+    padding: 8px 32px;
     color: #000;
     border: 0;
     border-radius: 10px;
@@ -70,6 +69,7 @@ button.confirm{
 
 .toolBlock{
     padding: 16px 0;
+    border-bottom: 2px solid #fff;
 }
 
 .toolInfo{
@@ -78,7 +78,7 @@ button.confirm{
 }
 
 ul {
-    padding: 8px 24px;
+    padding: 8px 8px 8px 24px;
 }
 
 li {

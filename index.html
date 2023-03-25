@@ -5,19 +5,20 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
 
         <link rel="stylesheet" href="./main.css">
-        <script src="./main.js"></script>
-        <title>salmdroidNW→csv変換</title>
+        <script type="text/javascript" src="./main.js"></script>
+        <script type="text/javascript" src="./lib/zlib/unzip.min.js"></script>
+        <title>salmdroidNW→CSV変換</title>
     </head>
     <body>
         <div id="main">
             <div class="toolBlock">
                 <form name="converter">
-                    <h1>salmdroidNW→csv変換</h1>
+                    <h1>salmdroidNW→CSV変換</h1>
                     <h3>リザルトバックアップファイル</h3>
-                    <p class="toolInfo">salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したzipファイルを展開し、<em>内部の「1」という名前のファイルを選択</em>してください。</p>
-                    <p><input type="file" name="input_file"></p>
-                    <h3>csvに含めるデータ</h3>
-                    <p class="toolInfo">csvファイルに含めたいバイトデータを選択してください。</p>
+                    <p class="toolInfo">salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したZIPファイル（salmdroid_backup_(日付時刻).zip）を選択してください。</p>
+                    <p><input type="file" name="input_file" accept="application/zip"></p>
+                    <h3>CSVに含めるデータ</h3>
+                    <p class="toolInfo">CSVファイルに含めたいバイトデータを選択してください。</p>
                     <h4>バイトリザルト</h4>
                     <p>
                         <label><input type="checkbox" class="dataSelector" name="id">バイトID</label>
@@ -33,6 +34,7 @@
                         <label><input type="checkbox" class="dataSelector" name="goldenEgg">合計金イクラ</label>
                         <label><input type="checkbox" class="dataSelector" name="egg">合計イクラ</label>
                         <label><input type="checkbox" class="dataSelector" name="scale">シャケのウロコ</label>
+                        <label><input type="checkbox" class="dataSelector" name="smellMeter">オカシラゲージ</label>
                         <label><input type="checkbox" class="dataSelector" name="bossName">出現オカシラシャケ</label>
                         <label><input type="checkbox" class="dataSelector" name="bossDefeat">オカシラシャケを倒せたか</label>
                     </p>
@@ -72,26 +74,20 @@
                         <label><input type="checkbox" class="dataSelector" name="enemy_selfDefeat">自撃破数</label>
                         <label><input type="checkbox" class="dataSelector" name="enemy_appear">出現数</label>
                     </p>
-                    <p><button type="button" class="confirm" onclick="Convert()">変換！</button></p>
+                    <p><button type="button" class="confirm" onclick="Convert()">CSVに変換してダウンロード</button></p>
                 </form>
-                </div>
-            <hr>
+            </div>
             <div class="toolBlock">
                 <h2>概要</h2>
                 <ul>
                     <li>
-                        Android用アプリ
-                        <a href="https://play.google.com/store/apps/details?id=com.aoi2blue.salmdroid.nw">salmdroidNW</a>
-                        で収集されたサーモンランNEXT WAVEのリザルトデータを、csvファイルに変換するツールです。
+                        Android用アプリ<a href="https://play.google.com/store/apps/details?id=com.aoi2blue.salmdroid.nw">salmdroidNW</a>で収集されたサーモンランNEXT WAVEのリザルトデータを、CSVファイルに変換するツールです。
                     </li>
                     <li>
-                        salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したzipファイルを解凍し、
-                        内部の「1」という名前のファイルを処理することで、
-                        蓄積されたデータをcsvファイルに変換します。
+                        salmdroidNWの「setting」＞「リザルトをバックアップ」で保存したzipファイルを解凍し、内部の「1」という名前のファイルを処理することで、蓄積されたデータをCSVファイルに変換します。
                     </li>
                     <li>
-                        変換したcsvファイルはGoogleスプレッドシートやExcelにインポートできるので、
-                        自分のバイトデータの分析や集計に利用して、立ち回りの研究などに利用することができます。
+                        変換したCSVファイルはGoogleスプレッドシートやExcelにインポートできるので、自分のバイトデータの分析や集計に利用して、立ち回りの研究などに利用することができます。
                     </li>
                 </ul>
                 <h2>注意事項</h2>
@@ -101,14 +97,33 @@
                     </li>
                     <li>
                         Javascriptによってクライアントサイドで処理しているため、バイトデータがツール側や外部に送信されることはありません。
-                        また、閲覧している機器によっては処理が遅いことがあります。
                     </li>
                     <li>
                         本ツールは非公式です。任天堂株式会社様やsalmdroidNW製作者様とは一切関係ございません。
                         また、salmdroidNWのアップデートなどによって使用できなくなることがあります。
                     </li>
                     <li>
-                        salmdroidNW 2.2.0 (2)で動作確認しています。
+                        salmdroidNW 2.2.1 (0)で動作確認しています。
+                    </li>
+                </ul>
+            </div>
+            <div class="toolBlock">
+                <h2>更新情報</h2>
+                <ul>
+                    <li>
+                        1.1
+                        <ul>
+                            <li>「リザルトバックアップファイル」で、展開前のZIPファイルを直接入力するように変更</li>
+                            <li>ダウンロードするCSVファイル名を入力したZIPファイル名に変更</li>
+                            <li>「CSVに含めるデータ」に「オカシラゲージ」を追加</li>
+                            <li>一部UIを調整</li>
+                        </ul>
+                    </li>
+                    <li>
+                        1.0
+                        <ul>
+                            <li>公開</li>
+                        </ul>
                     </li>
                 </ul>
             </div>
